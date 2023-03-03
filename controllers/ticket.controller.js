@@ -92,6 +92,46 @@ exports.updateTicket = async (req, res) => {
     }
  }
 
-exports.getAllTickets = async (req, res) => { }
+const canFind = (user, ticket) => {
+    return user.userId == ticket.reporter ||
+        user.userId == ticket.assignee ||
+        user.userType == constants.userTypes.admin
+}
 
-exports.getOneTicket = async (req, res) => {}
+exports.getAllTickets = async (req, res) => {
+
+    const queryObj = {}
+
+    if (req.query.status != undefined) {
+        queryObj.status = req.query.status
+    }
+
+    const savedUser = await User.findOne({ userId: req.body.userId })
+    console.log(savedUser)
+     if (savedUser.userType == constants.userTypes.admin) {
+        // Send empty queryObj
+    } else if (savedUser.userType == constants.userTypes.customer) {
+        queryObj.reporter = savedUser.userId
+    } else {
+        queryObj.assignee = savedUser.userId
+    }
+    
+
+    const tickets = await Ticket.find(queryObj)
+    res.status(200).send(objectConverter.ticketListResponse(tickets))
+ }
+
+exports.getOneTicket = async (req, res) => {
+    const ticket = await Ticket.findOne({ _id: req.params.id })
+    const savedUser = await User.findOne({
+        userId: req.body.userId
+    })
+    if(canFind(savedUser, ticket))
+        res.status(200).send(objectConverter.ticketResponse(ticket))
+    else {
+        console.log("Ticket cannot be found without access to the ticket")
+        res.status(401).send({
+            message: "Ticket can be found only by the customer who created it"
+        })
+    }
+}
