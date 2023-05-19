@@ -6,4 +6,4 @@ It follows the Model-View-Controller (MVC) architecture and focuses on providing
 
 The application allows customers to create, update, and delete tickets, while engineers can view their assigned tickets and update their statuses.
 
-You and also checkout the [Frontend] (https://github.com/kouliksarker/crm-frontend) of the CRM App
+You and also checkout the [Frontend](https://github.com/kouliksarker/crm-frontend) of the CRM App
